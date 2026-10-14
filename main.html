@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juan Carlos Arroyo Baquerizo - CV & Portfolio</title>
+    <!-- Tailwind CSS CDN for utility styling alongside custom Neumorphic classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Light Mode Neumorphic Shadows */
+        .light body {
+            background-color: #E4EBF5;
+            color: #2D3748;
+        }
+        .neu-flat {
+            background: #E4EBF5;
+            box-shadow: 9px 9px 16px #b8bec9, -9px -9px 16px #ffffff;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+        .neu-flat-sm {
+            background: #E4EBF5;
+            box-shadow: 5px 5px 10px #b8bec9, -5px -5px 10px #ffffff;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+        .neu-inset {
+            background: #E4EBF5;
+            box-shadow: inset 4px 4px 8px #b8bec9, inset -4px -4px 8px #ffffff;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+        .neu-button {
+            background: #E4EBF5;
+            box-shadow: 6px 6px 12px #b8bec9, -6px -6px 12px #ffffff;
+            transition: all 0.2s ease;
+        }
+        .neu-button:hover {
+            box-shadow: 4px 4px 8px #b8bec9, -4px -4px 8px #ffffff;
+        }
+        .neu-button:active, .neu-button.active {
+            box-shadow: inset 3px 3px 6px #b8bec9, inset -3px -3px 6px #ffffff;
+        }
+
+        /* Dark Mode Neumorphic Shadows */
+        .dark .neu-flat {
+            background: #1a202c;
+            box-shadow: 9px 9px 16px #10141d, -9px -9px 16px #242c3b;
+        }
+        .dark .neu-flat-sm {
+            background: #1a202c;
+            box-shadow: 5px 5px 10px #10141d, -5px -5px 10px #242c3b;
+        }
+        .dark .neu-inset {
+            background: #1a202c;
+            box-shadow: inset 4px 4px 8px #10141d, inset -4px -4px 8px #242c3b;
+        }
+        .dark .neu-button {
+            background: #1a202c;
+            box-shadow: 6px 6px 12px #10141d, -6px -6px 12px #242c3b;
+        }
+        .dark .neu-button:hover {
+            box-shadow: 4px 4px 8px #10141d, -4px -4px 8px #242c3b;
+        }
+        .dark .neu-button:active, .dark .neu-button.active {
+            box-shadow: inset 3px 3px 6px #10141d, inset -3px -3px 6px #242c3b;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: inherit;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b8bec9;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16 bg-[#E4EBF5] text-[#2D3748] dark:bg-[#0f172a] dark:text-slate-100">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-50 bg-[#E4EBF5]/90 dark:bg-[#0f172a]/90 backdrop-blur-md px-6 py-4 shadow-[0_8px_16px_rgba(163,177,198,0.5),0_-8px_16px_rgba(255,255,255,0.8)] dark:shadow-[0_8px_16px_rgba(0,0,0,0.5)] mb-8">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full neu-inset flex items-center justify-center font-bold">
+                    JA
+                </div>
+                <div>
+                    <h1 class="text-sm sm:text-base font-bold tracking-tight">Juan Carlos Arroyo Baquerizo</h1>
+                    <p class="text-xs text-[#606f7b] dark:text-slate-400 font-medium">Junior Cybersecurity Analyst | AI Developer</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Dark / Light Mode Toggle Button -->
+                <button onclick="toggleTheme()" id="themeToggleBtn" class="px-3.5 py-2 rounded-xl neu-button text-xs font-bold flex items-center gap-2">
+                    <span id="themeIcon">🌙</span> <span id="themeText">Dark Mode</span>
+                </button>
+                <button onclick="openModal()" class="px-4 py-2 rounded-xl neu-button text-xs font-bold">
+                    Quick Contact
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6">
+
+        <!-- Hero Profile Section -->
+        <section class="neu-flat rounded-3xl p-6 sm:p-10 mb-10 flex flex-col md:flex-row items-center gap-8">
+            <div class="relative group">
+                <div class="w-40 h-40 sm:w-48 sm:h-48 rounded-2xl p-2 neu-inset">
+                    <img 
+                        src="img20260804_10252243.png" 
+                        alt="Juan Carlos Arroyo Baquerizo" 
+                        class="w-full h-full object-cover rounded-xl grayscale hover:grayscale-0 transition-all duration-500"
+                        onerror="this.src='https://placehold.co/400x400/E4EBF5/2D3748?text=JAB';"
+                    />
+                </div>
+                <span class="absolute bottom-4 right-4 w-4 h-4 bg-emerald-500 border-2 border-[#E4EBF5] dark:border-[#1a202c] rounded-full animate-pulse"></span>
+            </div>
+
+            <div class="flex-1 text-center md:text-left">
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold neu-inset text-[#4a5568] dark:text-slate-300 mb-3">
+                    Quito, Ecuador
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold mb-2">Juan Carlos Arroyo Baquerizo</h2>
+                <p class="text-sm sm:text-base font-medium text-[#4a5568] dark:text-slate-300 mb-6">
+                    Junior Cybersecurity Analyst & AI Developer specializing in secure software architectures, Retrieval-Augmented Generation (RAG) pipelines, and LLM integrations.
+                </p>
+                <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                    <a href="mailto:juanarroyobaquerizo2812@gmail.com" class="px-4 py-2.5 rounded-xl neu-button text-xs font-bold flex items-center gap-2">
+                        ✉️ Email Me
+                    </a>
+                    <a href="https://github.com/Juancb28" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 rounded-xl neu-button text-xs font-bold flex items-center gap-2">
+                        🐙 GitHub: Juancb28
+                    </a>
+                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 rounded-xl neu-button text-xs font-bold flex items-center gap-2">
+                        💼 LinkedIn
+                    </a>
+                    <a href="https://wa.me/593995806330?text=Hola%20Juan%20Carlos,%20vi%20tu%20portafolio%20y%20me%20gustaría%20contactarte." target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 rounded-xl neu-button text-xs font-bold flex items-center gap-2">
+                        📞 (+593) 99 580 6330
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Neumorphic Navigation Controller -->
+        <section class="mb-10">
+            <h3 class="text-lg font-bold mb-4 px-2">Interactive Dashboard</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                <button onclick="switchTab('overview')" id="tab-overview" class="p-4 rounded-2xl flex flex-col items-center justify-center gap-2 active neu-button">
+                    <span class="text-2xl text-blue-600 dark:text-blue-400">📊</span>
+                    <span class="text-xs font-semibold">Overview</span>
+                </button>
+                <button onclick="switchTab('experience')" id="tab-experience" class="p-4 rounded-2xl flex flex-col items-center justify-center gap-2 neu-button">
+                    <span class="text-2xl text-amber-600 dark:text-amber-400">⚡</span>
+                    <span class="text-xs font-semibold">Experience</span>
+                </button>
+                <button onclick="switchTab('education')" id="tab-education" class="p-4 rounded-2xl flex flex-col items-center justify-center gap-2 neu-button">
+                    <span class="text-2xl text-emerald-600 dark:text-emerald-400">🎓</span>
+                    <span class="text-xs font-semibold">Education</span>
+                </button>
+                <button onclick="switchTab('skills')" id="tab-skills" class="p-4 rounded-2xl flex flex-col items-center justify-center gap-2 neu-button">
+                    <span class="text-2xl text-purple-600 dark:text-purple-400">💻</span>
+                    <span class="text-xs font-semibold">Tech Stack</span>
+                </button>
+                <button onclick="switchTab('certifications')" id="tab-certifications" class="p-4 rounded-2xl flex flex-col items-center justify-center gap-2 neu-button">
+                    <span class="text-2xl text-rose-600 dark:text-rose-400">🛡️</span>
+                    <span class="text-xs font-semibold">Certifications</span>
+                </button>
+                <button onclick="switchTab('contact')" id="tab-contact" class="p-4 rounded-2xl flex flex-col items-center justify-center gap-2 neu-button">
+                    <span class="text-2xl text-indigo-600 dark:text-indigo-400">📨</span>
+                    <span class="text-xs font-semibold">API Contact</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Main Content Pane -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- Experience Pane -->
+                <div id="pane-experience" class="content-pane neu-flat rounded-3xl p-6 sm:p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold flex items-center gap-2">
+                            <span>⚡</span> Professional Experience
+                        </h3>
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full neu-inset">Active</span>
+                    </div>
+
+                    <div class="space-y-8">
+                        <!-- Job 1 -->
+                        <div class="relative pl-6 border-l-2 border-[#b8bec9] dark:border-slate-700">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full neu-inset border-2 border-[#4a5568]"></div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                                <h4 class="font-bold text-base">AI and Backend Development</h4>
+                                <span class="text-xs font-bold text-[#3182ce] dark:text-blue-400">April 2026 – June 2026</span>
+                            </div>
+                            <p class="text-xs font-semibold text-[#4a5568] dark:text-slate-400 mb-3">Vibratio EC S.A.S. (Pericles Project) • Quito, Ecuador</p>
+                            <ul class="space-y-2 text-xs text-[#4a5568] dark:text-slate-300 leading-relaxed">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-[#3182ce] font-bold">•</span>
+                                    <span>Designed and developed Retrieval-Augmented Generation (RAG) pipelines and mass multi-format legal document ingestion into the Qdrant vector database.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-[#3182ce] font-bold">•</span>
+                                    <span>Refactored processing pipelines and queries, reducing system response latency from ~2 min to ~20 seconds and optimizing LLM token consumption.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-[#3182ce] font-bold">•</span>
+                                    <span>Built robust Python microservices using FastAPI, implementing security mechanisms for API consumption and access control management.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-[#3182ce] font-bold">•</span>
+                                    <span>Constructed intent flows and block-based conversational memory with automatic executive summaries within a microservices architecture.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-[#3182ce] font-bold">•</span>
+                                    <span>Executed integration testing (Web and WhatsApp) and version control using Git and GitHub under agile methodologies.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Job 2 -->
+                        <div class="relative pl-6 border-l-2 border-[#b8bec9] dark:border-slate-700">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full neu-inset border-2 border-[#4a5568]"></div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                                <h4 class="font-bold text-base">Digital Literacy & Cybersecurity Trainer</h4>
+                                <span class="text-xs font-bold text-[#3182ce] dark:text-blue-400">October 2024 – February 2025</span>
+                            </div>
+                            <p class="text-xs font-semibold text-[#4a5568] dark:text-slate-400 mb-3">Digital Inclusion Project • Quito, Ecuador</p>
+                            <ul class="space-y-2 text-xs text-[#4a5568] dark:text-slate-300 leading-relaxed">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-[#3182ce] font-bold">•</span>
+                                    <span>Provided personalized training in digital literacy and basic cybersecurity best practices for personal data protection to priority groups.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-[#3182ce] font-bold">•</span>
+                                    <span>Created methodological guides focused on secure technology adoption and information privacy.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education Pane -->
+                <div id="pane-education" class="content-pane neu-flat rounded-3xl p-6 sm:p-8">
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <span>🎓</span> Education
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-2xl neu-inset">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h4 class="font-bold text-sm sm:text-base">Escuela Politécnica Nacional (EPN)</h4>
+                                    <p class="text-xs text-[#3182ce] dark:text-blue-400 font-semibold">B.S. in Software Engineering</p>
+                                </div>
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-lg neu-flat-sm">2023 – Present</span>
+                            </div>
+                            <p class="text-xs text-[#4a5568] dark:text-slate-300 mt-2">
+                                Quito, Ecuador • Focus on software architecture, algorithms, artificial intelligence and machine learning, databases, and information security.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl neu-inset">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h4 class="font-bold text-sm sm:text-base">Colegio Militar Nº1 "Eloy Alfaro"</h4>
+                                    <p class="text-xs text-[#3182ce] dark:text-blue-400 font-semibold">High School Diploma in General Sciences</p>
+                                </div>
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-lg neu-flat-sm">2018 – 2021</span>
+                            </div>
+                            <p class="text-xs text-[#4a5568] dark:text-slate-300 mt-2">Quito, Ecuador</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certifications Pane -->
+                <div id="pane-certifications" class="content-pane neu-flat rounded-3xl p-6 sm:p-8">
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <span>🛡️</span> Certifications & Training
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-2xl neu-flat-sm">
+                            <h4 class="font-bold text-xs sm:text-sm mb-1">Fundamentals and Trends in Artificial Intelligence</h4>
+                            <p class="text-xs text-[#4a5568] dark:text-slate-300">JISIC 2025 XII, Escuela Politécnica Nacional.</p>
+                        </div>
+                        <div class="p-4 rounded-2xl neu-flat-sm">
+                            <h4 class="font-bold text-xs sm:text-sm mb-1">Self-taught Training and Practical Labs in Cybersecurity</h4>
+                            <p class="text-xs text-[#4a5568] dark:text-slate-300">Virtual environments, vulnerability analysis, network scanning, and penetration testing labs on TryHackMe.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Sidebar Pane -->
+            <div class="space-y-8">
+                
+                <!-- Tech Stack & Skills -->
+                <div id="pane-skills" class="content-pane neu-flat rounded-3xl p-6 sm:p-8">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span>💻</span> Technical Skills
+                    </h3>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">Python (FastAPI)</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">Java (Spring Boot)</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">RAG</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">Qdrant</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">MongoDB</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">PostgreSQL</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">LangChain</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">Gemini / Gemma</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">Cybersecurity</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">Vulnerability Analysis</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">Git</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">Docker</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">Linux (Arch/Kali)</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">VMware</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">REST APIs</span>
+                        <span class="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">Microservices</span>
+                    </div>
+
+                    <h4 class="font-bold text-sm mb-3">Languages & Interests</h4>
+                    <div class="space-y-3 text-xs text-[#4a5568] dark:text-slate-300">
+                        <p><strong>Languages:</strong> Spanish (Native), English (Intermediate - B2).</p>
+                        <p><strong>Interests:</strong> Fiction and philosophical literature, handheld GPS navigation for hiking and mountaineering, offensive/defensive cybersecurity.</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Express API Contact Form -->
+                <div id="pane-contact" class="content-pane neu-flat rounded-3xl p-6 sm:p-8">
+                    <h3 class="text-lg font-bold mb-2 flex items-center gap-2">
+                        <span>📨</span> Express Backend Contact
+                    </h3>
+                    <p class="text-xs text-[#606f7b] dark:text-slate-400 mb-6">Send a message directly to simulated Node.js/Express API endpoint.</p>
+
+                    <form id="contactForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-[#4a5568] dark:text-slate-300 mb-1">Your Name</label>
+                            <input 
+                                type="text" 
+                                id="contactName" 
+                                required 
+                                placeholder="John Doe" 
+                                class="w-full px-4 py-3 rounded-xl neu-inset border-none text-xs focus:outline-none bg-transparent"
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-[#4a5568] dark:text-slate-300 mb-1">Your Email</label>
+                            <input 
+                                type="email" 
+                                id="contactEmail" 
+                                required 
+                                placeholder="john@example.com" 
+                                class="w-full px-4 py-3 rounded-xl neu-inset border-none text-xs focus:outline-none bg-transparent"
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-[#4a5568] dark:text-slate-300 mb-1">Message</label>
+                            <textarea 
+                                id="contactMessage" 
+                                rows="3" 
+                                required 
+                                placeholder="Let's collaborate on AI or Cybersecurity..."
+                                class="w-full px-4 py-3 rounded-xl neu-inset border-none text-xs focus:outline-none resize-none bg-transparent"
+                            ></textarea>
+                        </div>
+
+                        <button 
+                            type="submit" 
+                            id="submitBtn"
+                            class="w-full py-3 rounded-xl neu-button text-xs font-bold"
+                        >
+                            Submit via Express API
+                        </button>
+
+                        <div id="formStatus" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Quick Modal Dialog with Hyperlinked Contact Details -->
+    <div id="contactModal" class="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="neu-flat rounded-3xl p-6 sm:p-8 max-w-md w-full relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full neu-flat-sm flex items-center justify-center text-xs font-bold">
+                ✕
+            </button>
+            <h3 class="text-lg font-bold mb-2">Hello Friend!</h3>
+            <p class="text-xs text-[#606f7b] dark:text-slate-400 mb-6">Enter your details and connect instantly with Juan Carlos Arroyo Baquerizo.</p>
+            
+            <div class="space-y-4 mb-6">
+                <!-- Email Link -->
+                <a href="mailto:juanarroyobaquerizo2812@gmail.com" class="block p-3 rounded-xl neu-inset hover:opacity-80 transition-opacity">
+                    <p class="text-xs font-bold text-[#3182ce] dark:text-blue-400">✉️ Email</p>
+                    <p class="text-xs text-[#606f7b] dark:text-slate-300">juanarroyobaquerizo2812@gmail.com</p>
+                </a>
+                <!-- Phone / WhatsApp Link -->
+                <a href="https://wa.me/593995806330?text=Hola%20Juan%20Carlos,%20vi%20tu%20portafolio%20y%20me%20gustaría%20contactarte." target="_blank" rel="noopener noreferrer" class="block p-3 rounded-xl neu-inset hover:opacity-80 transition-opacity">
+                    <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400">📞 Phone / WhatsApp</p>
+                    <p class="text-xs text-[#606f7b] dark:text-slate-300">(+593) 99 580 6330 • Quito, Ecuador</p>
+                </a>
+            </div>
+
+            <button onclick="closeModal()" class="w-full py-3 rounded-xl neu-button text-xs font-bold">
+                Close Window
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="max-w-6xl mx-auto px-4 mt-16 text-center text-xs text-[#718096] dark:text-slate-500">
+        <p>© 2026 Juan Carlos Arroyo Baquerizo • Built with HTML5, CSS3, & Vanilla JavaScript Neumorphism</p>
+    </footer>
+
+    <!-- JavaScript Controller Logic -->
+    <script>
+        // Theme Toggle Controller
+        function toggleTheme() {
+            const htmlEl = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            if (htmlEl.classList.contains('dark')) {
+                htmlEl.classList.remove('dark');
+                htmlEl.classList.add('light');
+                localStorage.setItem('theme', 'light');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark Mode';
+            } else {
+                htmlEl.classList.remove('light');
+                htmlEl.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light Mode';
+            }
+        }
+
+        // Initialize Theme from localStorage
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const htmlEl = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            if (savedTheme === 'dark') {
+                htmlEl.classList.add('dark');
+                if(themeIcon) themeIcon.textContent = '☀️';
+                if(themeText) themeText.textContent = 'Light Mode';
+            } else {
+                htmlEl.classList.add('light');
+                if(themeIcon) themeIcon.textContent = '🌙';
+                if(themeText) themeText.textContent = 'Dark Mode';
+            }
+        })();
+
+        // Switch active dashboard tabs and show/hide corresponding panes or highlight overview
+        function switchTab(tabId) {
+            const tabs = ['overview', 'experience', 'education', 'skills', 'certifications', 'contact'];
+            
+            tabs.forEach(t => {
+                const btn = document.getElementById('tab-' + t);
+                if (btn) {
+                    if (t === tabId) {
+                        btn.classList.add('active', 'neu-inset');
+                        btn.classList.remove('neu-button');
+                    } else {
+                        btn.classList.remove('active', 'neu-inset');
+                        btn.classList.add('neu-button');
+                    }
+                }
+            });
+
+            const allPanes = ['pane-experience', 'pane-education', 'pane-certifications', 'pane-skills', 'pane-contact'];
+            allPanes.forEach(paneId => {
+                const el = document.getElementById(paneId);
+                if (el) {
+                    if (tabId === 'overview' || paneId.includes(tabId)) {
+                        el.style.display = 'block';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Modal Controls
+        function openModal() {
+            const modal = document.getElementById('contactModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('contactModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Simulated Express.js Backend API Form Submission
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const message = document.getElementById('contactMessage').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const statusDiv = document.getElementById('formStatus');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Transmitting to Server...';
+            statusDiv.classList.add('hidden');
+
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit via Express API';
+                
+                statusDiv.classList.remove('hidden');
+                if (name && email && message) {
+                    statusDiv.className = 'p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300';
+                    statusDiv.textContent = 'Success! Message processed by Express.js API and saved to MongoDB.';
+                    document.getElementById('contactForm').reset();
+                } else {
+                    statusDiv.className = 'p-3 rounded-xl text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300';
+                    statusDiv.textContent = 'Error: Please fill in all required fields.';
+                }
+            }, 1000);
+        }
+
+        // Initialize default view
+        window.onload = function() {
+            switchTab('overview');
+        };
+    </script>
+</body>
+</html>
