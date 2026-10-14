@@ -1,5 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaWhatsapp, FaPhoneAlt } from 'react-icons/fa';
+import {
+  FaWhatsapp, FaBrain, FaLink, FaRobot, FaDatabase,
+  FaExchangeAlt, FaCubes, FaBug,
+} from 'react-icons/fa';
+import {
+  SiPython, SiSpringboot, SiMongodb, SiPostgresql, SiGit, SiDocker,
+  SiKalilinux, SiArchlinux, SiVmware,
+} from 'react-icons/si';
 
 /* =========================
    Datos
@@ -77,18 +84,38 @@ const CERTIFICATIONS = [
 ];
 
 /* Habilidades agrupadas: más fáciles de escanear que una lista plana */
+/* Cada habilidad lleva su icono y el color de su marca */
 const SKILL_GROUPS = [
   {
     title: 'AI & Data',
-    items: ['RAG', 'LangChain', 'Gemini / Gemma', 'Qdrant', 'MongoDB', 'PostgreSQL'],
+    items: [
+      { name: 'RAG', Icon: FaBrain, color: '#D53F8C' },
+      { name: 'LangChain', Icon: FaLink, color: '#1C8C6E' },
+      { name: 'Gemini / Gemma', Icon: FaRobot, color: '#8E75F2' },
+      { name: 'Qdrant', Icon: FaDatabase, color: '#DC244C' },
+      { name: 'MongoDB', Icon: SiMongodb, color: '#47A248' },
+      { name: 'PostgreSQL', Icon: SiPostgresql, color: '#4169E1' },
+    ],
   },
   {
     title: 'Backend',
-    items: ['Python (FastAPI)', 'Java (Spring Boot)', 'REST APIs', 'Microservices', 'Git', 'Docker'],
+    items: [
+      { name: 'Python (FastAPI)', Icon: SiPython, color: '#3776AB' },
+      { name: 'Java (Spring Boot)', Icon: SiSpringboot, color: '#6DB33F' },
+      { name: 'REST APIs', Icon: FaExchangeAlt, color: '#3182CE' },
+      { name: 'Microservices', Icon: FaCubes, color: '#DD6B20' },
+      { name: 'Git', Icon: SiGit, color: '#F05032' },
+      { name: 'Docker', Icon: SiDocker, color: '#2496ED' },
+    ],
   },
   {
     title: 'Security & Infra',
-    items: ['Cybersecurity', 'Vulnerability Analysis', 'Linux (Arch/Kali)', 'VMware'],
+    items: [
+      { name: 'Cybersecurity', Icon: SiKalilinux, color: '#557C94' },
+      { name: 'Vulnerability Analysis', Icon: FaBug, color: '#E53E3E' },
+      { name: 'Linux (Arch/Kali)', Icon: SiArchlinux, color: '#1793D1' },
+      { name: 'VMware', Icon: SiVmware, color: '#718096' },
+    ],
   },
 ];
 
@@ -231,9 +258,13 @@ function SkillsSection() {
           <div key={group.title}>
             <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${TEXT_SUBTLE}`}>{group.title}</h4>
             <div className="flex flex-wrap gap-2">
-              {group.items.map((skill) => (
-                <span key={skill} className={`px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold ${TEXT_MUTED}`}>
-                  {skill}
+              {group.items.map(({ name, Icon, color }) => (
+                <span
+                  key={name}
+                  className={`px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold flex items-center gap-1.5 ${TEXT_MUTED}`}
+                >
+                  <Icon className="text-sm shrink-0" style={{ color }} aria-hidden="true" />
+                  {name}
                 </span>
               ))}
             </div>
@@ -378,7 +409,6 @@ export default function App() {
                 className={BTN_PILL}
                 aria-label={`Phone and WhatsApp ${PHONE_LABEL}`}
               >
-                <FaPhoneAlt className={ACCENT} aria-hidden="true" />
                 <FaWhatsapp className="text-base text-[#25D366]" aria-hidden="true" />
                 <span>{PHONE_LABEL}</span>
               </a>
@@ -473,7 +503,6 @@ export default function App() {
               </a>
               <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="block p-4 rounded-xl neu-inset hover:opacity-80 transition-opacity">
                 <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                  <FaPhoneAlt aria-hidden="true" />
                   <FaWhatsapp className="text-base text-[#25D366]" aria-hidden="true" />
                   <span>Phone / WhatsApp</span>
                 </p>
