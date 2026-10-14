@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light Mode Neumorphic Shadows */
+.light body {
+    background-color: #E4EBF5;
+    color: #2D3748;
+}
+.neu-flat {
+    background: #E4EBF5;
+    box-shadow: 9px 9px 16px #b8bec9, -9px -9px 16px #ffffff;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.neu-flat-sm {
+    background: #E4EBF5;
+    box-shadow: 5px 5px 10px #b8bec9, -5px -5px 10px #ffffff;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.neu-inset {
+    background: #E4EBF5;
+    box-shadow: inset 4px 4px 8px #b8bec9, inset -4px -4px 8px #ffffff;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.neu-button {
+    background: #E4EBF5;
+    box-shadow: 6px 6px 12px #b8bec9, -6px -6px 12px #ffffff;
+    transition: all 0.2s ease;
+}
+.neu-button:hover {
+    box-shadow: 4px 4px 8px #b8bec9, -4px -4px 8px #ffffff;
+}
+.neu-button:active, .neu-button.active {
+    box-shadow: inset 3px 3px 6px #b8bec9, inset -3px -3px 6px #ffffff;
+}
+
+/* Dark Mode Neumorphic Shadows */
+.dark .neu-flat {
+    background: #1a202c;
+    box-shadow: 9px 9px 16px #10141d, -9px -9px 16px #242c3b;
+}
+.dark .neu-flat-sm {
+    background: #1a202c;
+    box-shadow: 5px 5px 10px #10141d, -5px -5px 10px #242c3b;
+}
+.dark .neu-inset {
+    background: #1a202c;
+    box-shadow: inset 4px 4px 8px #10141d, inset -4px -4px 8px #242c3b;
+}
+.dark .neu-button {
+    background: #1a202c;
+    box-shadow: 6px 6px 12px #10141d, -6px -6px 12px #242c3b;
+}
+.dark .neu-button:hover {
+    box-shadow: 4px 4px 8px #10141d, -4px -4px 8px #242c3b;
+}
+.dark .neu-button:active, .dark .neu-button.active {
+    box-shadow: inset 3px 3px 6px #10141d, inset -3px -3px 6px #242c3b;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: inherit;
+}
+::-webkit-scrollbar-thumb {
+    background: #b8bec9;
+    border-radius: 4px;
+}
