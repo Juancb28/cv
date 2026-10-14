@@ -8,7 +8,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
-    # <--- AQUÍ ESTÁ LO QUE FALTA (AÑADE ESTO) --->
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
