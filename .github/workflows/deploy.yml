@@ -7,6 +7,12 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    
+    # <--- AQUÍ ESTÁ LO QUE FALTA (AÑADE ESTO) --->
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,7 +35,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'  # <--- Aquí le indicamos que suba la carpeta compilada de Vite
+          path: './dist'
 
       - name: Deploy to GitHub Pages
         id: deployment
