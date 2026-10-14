@@ -1,12 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { FaWhatsapp } from 'react-icons/fa';
 
 /* =========================
    Datos
    ========================= */
 const EMAIL = 'juanarroyobaquerizo2812@gmail.com';
+const PHONE_LABEL = '(+593) 99 580 6330';
 const WHATSAPP_URL =
   'https://wa.me/593995806330?text=Hola%20Juan%20Carlos,%20vi%20tu%20portafolio%20y%20me%20gustaría%20contactarte.';
-const PLACEHOLDER_IMG = 'https://placehold.co/400x400/E4EBF5/2D3748?text=JAB';
+const GITHUB_URL = 'https://github.com/Juancb28';
+const LINKEDIN_URL = 'https://linkedin.com'; // TODO: reemplazar por la URL real del perfil
+const PLACEHOLDER_IMG = 'public/profile.jpeg';
+
+/* Viñetas visibles por trabajo antes de "Show more" */
+const VISIBLE_BULLETS = 2;
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: '📊', color: 'text-blue-600 dark:text-blue-400' },
@@ -14,29 +21,28 @@ const TABS = [
   { id: 'education', label: 'Education', icon: '🎓', color: 'text-emerald-600 dark:text-emerald-400' },
   { id: 'skills', label: 'Tech Stack', icon: '💻', color: 'text-purple-600 dark:text-purple-400' },
   { id: 'certifications', label: 'Certifications', icon: '🛡️', color: 'text-rose-600 dark:text-rose-400' },
-  { id: 'contact', label: 'API Contact', icon: '📨', color: 'text-indigo-600 dark:text-indigo-400' },
 ];
 
 const JOBS = [
   {
     title: 'AI and Backend Development',
-    period: 'April 2026 – June 2026',
+    period: 'Apr 2026 – Jun 2026',
     company: 'Vibratio EC S.A.S. (Pericles Project) • Quito, Ecuador',
     bullets: [
-      'Designed and developed Retrieval-Augmented Generation (RAG) pipelines and mass multi-format legal document ingestion into the Qdrant vector database.',
-      'Refactored processing pipelines and queries, reducing system response latency from ~2 min to ~20 seconds and optimizing LLM token consumption.',
-      'Built robust Python microservices using FastAPI, implementing security mechanisms for API consumption and access control management.',
-      'Constructed intent flows and block-based conversational memory with automatic executive summaries within a microservices architecture.',
-      'Executed integration testing (Web and WhatsApp) and version control using Git and GitHub under agile methodologies.',
+      'Built RAG pipelines and multi-format legal document ingestion into the Qdrant vector database.',
+      'Cut system response latency from ~2 min to ~20 s and reduced LLM token consumption.',
+      'Developed secure Python microservices with FastAPI, including API security and access control.',
+      'Designed intent flows and block-based conversational memory with automatic executive summaries.',
+      'Ran Web and WhatsApp integration tests and managed versions with Git/GitHub under agile practices.',
     ],
   },
   {
     title: 'Digital Literacy & Cybersecurity Trainer',
-    period: 'October 2024 – February 2025',
+    period: 'Oct 2024 – Feb 2025',
     company: 'Digital Inclusion Project • Quito, Ecuador',
     bullets: [
-      'Provided personalized training in digital literacy and basic cybersecurity best practices for personal data protection to priority groups.',
-      'Created methodological guides focused on secure technology adoption and information privacy.',
+      'Trained priority groups in digital literacy and personal data protection.',
+      'Created guides on secure technology adoption and information privacy.',
     ],
   },
 ];
@@ -46,8 +52,7 @@ const EDUCATION = [
     institution: 'Escuela Politécnica Nacional (EPN)',
     degree: 'B.S. in Software Engineering',
     period: '2023 – Present',
-    description:
-      'Quito, Ecuador • Focus on software architecture, algorithms, artificial intelligence and machine learning, databases, and information security.',
+    description: 'Software architecture, AI & machine learning, databases and information security.',
   },
   {
     institution: 'Colegio Militar Nº1 "Eloy Alfaro"',
@@ -63,28 +68,49 @@ const CERTIFICATIONS = [
     description: 'JISIC 2025 XII, Escuela Politécnica Nacional.',
   },
   {
-    title: 'Self-taught Training and Practical Labs in Cybersecurity',
-    description:
-      'Virtual environments, vulnerability analysis, network scanning, and penetration testing labs on TryHackMe.',
+    title: 'Practical Cybersecurity Labs (TryHackMe)',
+    description: 'Vulnerability analysis, network scanning and penetration testing in virtual environments.',
   },
 ];
 
-const SKILLS = [
-  'Python (FastAPI)', 'Java (Spring Boot)', 'RAG', 'Qdrant', 'MongoDB',
-  'PostgreSQL', 'LangChain', 'Gemini / Gemma', 'Cybersecurity',
-  'Vulnerability Analysis', 'Git', 'Docker', 'Linux (Arch/Kali)',
-  'VMware', 'REST APIs', 'Microservices',
+/* Habilidades agrupadas: más fáciles de escanear que una lista plana */
+const SKILL_GROUPS = [
+  {
+    title: 'AI & Data',
+    items: ['RAG', 'LangChain', 'Gemini / Gemma', 'Qdrant', 'MongoDB', 'PostgreSQL'],
+  },
+  {
+    title: 'Backend',
+    items: ['Python (FastAPI)', 'Java (Spring Boot)', 'REST APIs', 'Microservices', 'Git', 'Docker'],
+  },
+  {
+    title: 'Security & Infra',
+    items: ['Cybersecurity', 'Vulnerability Analysis', 'Linux (Arch/Kali)', 'VMware'],
+  },
 ];
+
+/* Orden de las secciones en cada columna (vista Overview) */
+const LEFT_SECTIONS = ['experience', 'education', 'certifications'];
+const RIGHT_SECTIONS = ['skills'];
+
+/* Clases reutilizables */
+const BTN_PILL = 'px-4 py-2.5 rounded-xl neu-button text-sm font-semibold flex items-center gap-2';
+const TEXT_MUTED = 'text-[#4a5568] dark:text-neutral-300';
+const TEXT_SUBTLE = 'text-[#606f7b] dark:text-neutral-400';
+const ACCENT = 'text-[#3182ce] dark:text-blue-300';
 
 /* =========================
    Utilidades
    ========================= */
 function getInitialDarkMode() {
   try {
-    return localStorage.getItem('theme') === 'dark';
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved === 'dark';
   } catch {
-    return false;
+    /* almacenamiento no disponible */
   }
+  // Sin preferencia guardada: respeta la configuración del sistema
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
 }
 
 function handleImgError(e) {
@@ -94,19 +120,146 @@ function handleImgError(e) {
 }
 
 /* =========================
+   Secciones de contenido
+   ========================= */
+function SectionTitle({ icon, children }) {
+  return (
+    <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+      <span aria-hidden="true">{icon}</span> {children}
+    </h3>
+  );
+}
+
+function JobItem({ job }) {
+  const [expanded, setExpanded] = useState(false);
+  const hidden = job.bullets.length - VISIBLE_BULLETS;
+  const bullets = expanded ? job.bullets : job.bullets.slice(0, VISIBLE_BULLETS);
+
+  return (
+    <div className="relative pl-6 border-l-2 border-[#b8bec9] dark:border-neutral-700">
+      <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full neu-inset border-2 border-[#4a5568] dark:border-neutral-500"></div>
+      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-1">
+        <h4 className="font-bold text-base">{job.title}</h4>
+        <span className={`text-xs font-bold whitespace-nowrap ${ACCENT}`}>{job.period}</span>
+      </div>
+      <p className={`text-xs font-semibold mb-3 ${TEXT_SUBTLE}`}>{job.company}</p>
+
+      <ul className={`space-y-2 text-sm leading-relaxed ${TEXT_MUTED}`}>
+        {bullets.map((bullet) => (
+          <li key={bullet} className="flex items-start gap-2">
+            <span className={`font-bold ${ACCENT}`} aria-hidden="true">•</span>
+            <span>{bullet}</span>
+          </li>
+        ))}
+      </ul>
+
+      {hidden > 0 && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          className={`mt-3 text-xs font-bold ${ACCENT} hover:underline`}
+        >
+          {expanded ? 'Show less ↑' : `Show ${hidden} more ↓`}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ExperienceSection() {
+  return (
+    <div className="neu-flat rounded-3xl p-6 sm:p-8">
+      <SectionTitle icon="⚡">Professional Experience</SectionTitle>
+      <div className="space-y-8">
+        {JOBS.map((job) => (
+          <JobItem key={job.title} job={job} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function EducationSection() {
+  return (
+    <div className="neu-flat rounded-3xl p-6 sm:p-8">
+      <SectionTitle icon="🎓">Education</SectionTitle>
+      <div className="space-y-5">
+        {EDUCATION.map((edu) => (
+          <div key={edu.institution} className="p-4 rounded-2xl neu-inset">
+            <div className="flex justify-between items-start gap-3">
+              <div>
+                <h4 className="font-bold text-sm sm:text-base">{edu.institution}</h4>
+                <p className={`text-sm font-semibold ${ACCENT}`}>{edu.degree}</p>
+              </div>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-lg neu-flat-sm whitespace-nowrap">{edu.period}</span>
+            </div>
+            <p className={`text-sm mt-2 ${TEXT_MUTED}`}>{edu.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CertificationsSection() {
+  return (
+    <div className="neu-flat rounded-3xl p-6 sm:p-8">
+      <SectionTitle icon="🛡️">Certifications &amp; Training</SectionTitle>
+      <div className="space-y-4">
+        {CERTIFICATIONS.map((cert) => (
+          <div key={cert.title} className="p-4 rounded-2xl neu-flat-sm">
+            <h4 className="font-bold text-sm mb-1">{cert.title}</h4>
+            <p className={`text-sm ${TEXT_MUTED}`}>{cert.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SkillsSection() {
+  return (
+    <div className="neu-flat rounded-3xl p-6 sm:p-8">
+      <SectionTitle icon="💻">Technical Skills</SectionTitle>
+
+      <div className="space-y-5 mb-6">
+        {SKILL_GROUPS.map((group) => (
+          <div key={group.title}>
+            <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${TEXT_SUBTLE}`}>{group.title}</h4>
+            <div className="flex flex-wrap gap-2">
+              {group.items.map((skill) => (
+                <span key={skill} className={`px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold ${TEXT_MUTED}`}>
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${TEXT_SUBTLE}`}>Languages</h4>
+      <p className={`text-sm ${TEXT_MUTED}`}>Spanish (Native) • English (B2)</p>
+    </div>
+  );
+}
+
+const SECTION_COMPONENTS = {
+  experience: ExperienceSection,
+  education: EducationSection,
+  certifications: CertificationsSection,
+  skills: SkillsSection,
+};
+
+/* =========================
    Componente principal
    ========================= */
 export default function App() {
   const [darkMode, setDarkMode] = useState(getInitialDarkMode);
   const [activeTab, setActiveTab] = useState('overview');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Estado del formulario
-  const [formName, setFormName] = useState('');
-  const [formEmail, setFormEmail] = useState('');
-  const [formMessage, setFormMessage] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [formStatus, setFormStatus] = useState(null);
+  const dashboardRef = useRef(null);
+  const isFirstRender = useRef(true);
 
   // Sincroniza el tema con <html> y localStorage
   useEffect(() => {
@@ -120,36 +273,37 @@ export default function App() {
     }
   }, [darkMode]);
 
+  // Al cambiar de pestaña, lleva la vista al dashboard (no en la carga inicial)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    dashboardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeTab]);
+
+  // Modal: cerrar con Escape y bloquear el scroll del fondo
+  useEffect(() => {
+    if (!isModalOpen) return undefined;
+    const onKey = (e) => e.key === 'Escape' && setIsModalOpen(false);
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [isModalOpen]);
+
   const toggleTheme = () => setDarkMode((prev) => !prev);
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setFormStatus(null);
-
-    setTimeout(() => {
-      setSubmitting(false);
-      if (formName && formEmail && formMessage) {
-        setFormStatus({
-          success: true,
-          text: 'Success! Message processed by Express.js API and saved to MongoDB.',
-        });
-        setFormName('');
-        setFormEmail('');
-        setFormMessage('');
-      } else {
-        setFormStatus({ success: false, text: 'Error: Please fill in all required fields.' });
-      }
-    }, 1000);
-  };
-
-  const showPane = (paneId) => activeTab === 'overview' || activeTab === paneId;
+  const featured = activeTab !== 'overview' ? activeTab : null;
+  const FeaturedSection = featured ? SECTION_COMPONENTS[featured] : null;
 
   return (
-    <div className="min-h-screen pb-16 bg-[#E4EBF5] text-[#2D3748] dark:bg-[#0f172a] dark:text-slate-100 selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen pb-16 bg-[#E4EBF5] text-[#2D3748] dark:bg-[#1e1e1e] dark:text-neutral-100 selection:bg-blue-500 selection:text-white">
 
       {/* Header / Navbar */}
-      <header className="sticky top-0 z-50 bg-[#E4EBF5]/90 dark:bg-[#0f172a]/90 backdrop-blur-md px-6 py-4 shadow-[0_8px_16px_rgba(163,177,198,0.5),0_-8px_16px_rgba(255,255,255,0.8)] dark:shadow-[0_8px_16px_rgba(0,0,0,0.5)] mb-8">
+      <header className="sticky top-0 z-40 bg-[#E4EBF5]/90 dark:bg-[#1e1e1e]/90 backdrop-blur-md px-6 py-4 shadow-[0_8px_16px_rgba(163,177,198,0.5),0_-8px_16px_rgba(255,255,255,0.8)] dark:shadow-[0_8px_16px_rgba(0,0,0,0.45)] mb-8">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full neu-inset flex items-center justify-center font-bold">
@@ -157,9 +311,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm sm:text-base font-bold tracking-tight">Juan Carlos Arroyo Baquerizo</h1>
-              <p className="text-xs text-[#606f7b] dark:text-slate-400 font-medium">
-                Junior Cybersecurity Analyst | AI Developer
-              </p>
+              <p className={`text-xs font-medium ${TEXT_SUBTLE}`}>Junior Cybersecurity Analyst | AI Developer</p>
             </div>
           </div>
 
@@ -167,9 +319,10 @@ export default function App() {
             <button
               type="button"
               onClick={toggleTheme}
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               className="px-3.5 py-2 rounded-xl neu-button text-xs font-bold flex items-center gap-2"
             >
-              <span>{darkMode ? '☀️' : '🌙'}</span>
+              <span aria-hidden="true">{darkMode ? '☀️' : '🌙'}</span>
               <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
             </button>
             <button
@@ -177,7 +330,7 @@ export default function App() {
               onClick={() => setIsModalOpen(true)}
               className="px-4 py-2 rounded-xl neu-button text-xs font-bold"
             >
-              Quick Contact
+              Contact
             </button>
           </div>
         </div>
@@ -188,7 +341,7 @@ export default function App() {
 
         {/* Hero Profile Section */}
         <section className="neu-flat rounded-3xl p-6 sm:p-10 mb-10 flex flex-col md:flex-row items-center gap-8">
-          <div className="relative group">
+          <div className="relative">
             <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-2xl p-2 neu-inset">
               <img
                 src="/img20260804_10252243.png"
@@ -197,294 +350,138 @@ export default function App() {
                 onError={handleImgError}
               />
             </div>
-            <span className="absolute bottom-4 right-4 w-4 h-4 bg-emerald-500 border-2 border-[#E4EBF5] dark:border-[#1a202c] rounded-full animate-pulse"></span>
+            <span
+              className="absolute bottom-4 right-4 w-4 h-4 bg-emerald-500 border-2 border-[#E4EBF5] dark:border-[#1e1e1e] rounded-full animate-pulse"
+              title="Available for work"
+            ></span>
           </div>
 
           <div className="flex-1 text-center md:text-left">
-            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold neu-inset text-[#4a5568] dark:text-slate-300 mb-3">
-              Quito, Ecuador
+            <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold neu-inset mb-3 ${TEXT_MUTED}`}>
+              📍 Quito, Ecuador
             </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold mb-2">Juan Carlos Arroyo Baquerizo</h2>
-            <p className="text-sm sm:text-base font-medium text-[#4a5568] dark:text-slate-300 mb-6">
-              Junior Cybersecurity Analyst &amp; AI Developer specializing in secure software architectures,
-              Retrieval-Augmented Generation (RAG) pipelines, and LLM integrations.
+            <h2 className="text-2xl sm:text-4xl font-extrabold mb-3">Juan Carlos Arroyo Baquerizo</h2>
+            <p className={`text-sm sm:text-base font-medium mb-6 max-w-xl mx-auto md:mx-0 ${TEXT_MUTED}`}>
+              Cybersecurity analyst and AI developer building secure backends, RAG pipelines and LLM integrations.
             </p>
             <div className="flex flex-wrap justify-center md:justify-start gap-3">
-              <a href={`mailto:${EMAIL}`} className="px-4 py-2.5 rounded-xl neu-button text-xs font-bold flex items-center gap-2">
-                ✉️ Email Me
+              <a href={`mailto:${EMAIL}`} className={BTN_PILL}>
+                <span aria-hidden="true">✉️</span> Email
               </a>
-              <a href="https://github.com/Juancb28" target="_blank" rel="noopener noreferrer" className="px-4 py-2.5 rounded-xl neu-button text-xs font-bold flex items-center gap-2">
-                🐙 GitHub: Juancb28
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={BTN_PILL}
+                aria-label={`Phone and WhatsApp ${PHONE_LABEL}`}
+              >
+                <FaWhatsapp className="text-base text-[#25D366]" aria-hidden="true" />
+                <span>{PHONE_LABEL}</span>
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="px-4 py-2.5 rounded-xl neu-button text-xs font-bold flex items-center gap-2">
-                💼 LinkedIn
+              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className={BTN_PILL}>
+                <span aria-hidden="true">🐙</span> GitHub
               </a>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="px-4 py-2.5 rounded-xl neu-button text-xs font-bold flex items-center gap-2">
-                📞 (+593) 99 580 6330
+              <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" className={BTN_PILL}>
+                <span aria-hidden="true">💼</span> LinkedIn
               </a>
             </div>
           </div>
         </section>
 
-        {/* Interactive Neumorphic Navigation Controller */}
-        <section className="mb-10">
-          <h3 className="text-lg font-bold mb-4 px-2">Interactive Dashboard</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+        {/* Navegación por secciones */}
+        <nav ref={dashboardRef} className="mb-10 scroll-mt-32" aria-label="Portfolio sections">
+          <div className="flex items-baseline justify-between gap-3 mb-4 px-2">
+            <h3 className="text-lg font-bold">Explore my profile</h3>
+            <p className={`hidden sm:block text-xs ${TEXT_SUBTLE}`}>Pick a section to focus on it</p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
+                aria-pressed={activeTab === tab.id}
                 className={`p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all ${
                   activeTab === tab.id ? 'active neu-inset' : 'neu-button'
                 }`}
               >
-                <span className={`text-2xl ${tab.color}`}>{tab.icon}</span>
+                <span className={`text-2xl ${tab.color}`} aria-hidden="true">{tab.icon}</span>
                 <span className="text-xs font-semibold">{tab.label}</span>
               </button>
             ))}
           </div>
-        </section>
+        </nav>
 
-        {/* Dynamic Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Sección elegida: centrada debajo de la navegación */}
+        {FeaturedSection && (
+          <section key={featured} className="featured-section max-w-3xl mx-auto mb-12">
+            <FeaturedSection />
+          </section>
+        )}
 
-          {/* Left Main Content Pane */}
-          <div className="lg:col-span-2 space-y-8">
-
-            {/* Experience Pane */}
-            {showPane('experience') && (
-              <div className="neu-flat rounded-3xl p-6 sm:p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold flex items-center gap-2">
-                    <span>⚡</span> Professional Experience
-                  </h3>
-                  <span className="text-xs font-semibold px-3 py-1 rounded-full neu-inset">Active</span>
-                </div>
-
-                <div className="space-y-8">
-                  {JOBS.map((job) => (
-                    <div key={job.title} className="relative pl-6 border-l-2 border-[#b8bec9] dark:border-slate-700">
-                      <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full neu-inset border-2 border-[#4a5568]"></div>
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
-                        <h4 className="font-bold text-base">{job.title}</h4>
-                        <span className="text-xs font-bold text-[#3182ce] dark:text-blue-400">{job.period}</span>
-                      </div>
-                      <p className="text-xs font-semibold text-[#4a5568] dark:text-slate-400 mb-3">{job.company}</p>
-                      <ul className="space-y-2 text-xs text-[#4a5568] dark:text-slate-300 leading-relaxed">
-                        {job.bullets.map((bullet) => (
-                          <li key={bullet} className="flex items-start gap-2">
-                            <span className="text-[#3182ce] font-bold">•</span>
-                            <span>{bullet}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Education Pane */}
-            {showPane('education') && (
-              <div className="neu-flat rounded-3xl p-6 sm:p-8">
-                <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                  <span>🎓</span> Education
-                </h3>
-                <div className="space-y-6">
-                  {EDUCATION.map((edu) => (
-                    <div key={edu.institution} className="p-4 rounded-2xl neu-inset">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="font-bold text-sm sm:text-base">{edu.institution}</h4>
-                          <p className="text-xs text-[#3182ce] dark:text-blue-400 font-semibold">{edu.degree}</p>
-                        </div>
-                        <span className="text-xs font-bold px-2.5 py-1 rounded-lg neu-flat-sm">{edu.period}</span>
-                      </div>
-                      <p className="text-xs text-[#4a5568] dark:text-slate-300 mt-2">{edu.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Certifications Pane */}
-            {showPane('certifications') && (
-              <div className="neu-flat rounded-3xl p-6 sm:p-8">
-                <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                  <span>🛡️</span> Certifications &amp; Training
-                </h3>
-                <div className="space-y-4">
-                  {CERTIFICATIONS.map((cert) => (
-                    <div key={cert.title} className="p-4 rounded-2xl neu-flat-sm">
-                      <h4 className="font-bold text-xs sm:text-sm mb-1">{cert.title}</h4>
-                      <p className="text-xs text-[#4a5568] dark:text-slate-300">{cert.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
+        {/* Vista completa: solo en Overview */}
+        {!featured && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="space-y-8 lg:col-span-2">
+              {LEFT_SECTIONS.map((id) => {
+                const Section = SECTION_COMPONENTS[id];
+                return <Section key={id} />;
+              })}
+            </div>
+            <div className="space-y-8">
+              {RIGHT_SECTIONS.map((id) => {
+                const Section = SECTION_COMPONENTS[id];
+                return <Section key={id} />;
+              })}
+            </div>
           </div>
-
-          {/* Right Sidebar Pane */}
-          <div className="space-y-8">
-
-            {/* Tech Stack & Skills */}
-            {showPane('skills') && (
-              <div className="neu-flat rounded-3xl p-6 sm:p-8">
-                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                  <span>💻</span> Technical Skills
-                </h3>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {SKILLS.map((skill) => (
-                    <span key={skill} className="px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold text-[#4a5568] dark:text-slate-300">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-
-                <h4 className="font-bold text-sm mb-3">Languages &amp; Interests</h4>
-                <div className="space-y-3 text-xs text-[#4a5568] dark:text-slate-300">
-                  <p><strong>Languages:</strong> Spanish (Native), English (Intermediate - B2).</p>
-                  <p>
-                    <strong>Interests:</strong> Fiction and philosophical literature, handheld GPS navigation for
-                    hiking and mountaineering, offensive/defensive cybersecurity.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Interactive Express API Contact Form */}
-            {showPane('contact') && (
-              <div className="neu-flat rounded-3xl p-6 sm:p-8">
-                <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
-                  <span>📨</span> Express Backend Contact
-                </h3>
-                <p className="text-xs text-[#606f7b] dark:text-slate-400 mb-6">
-                  Send a message directly to simulated Node.js/Express API endpoint.
-                </p>
-
-                <form onSubmit={handleFormSubmit} className="space-y-4">
-                  <div>
-                    <label htmlFor="contactName" className="block text-xs font-bold text-[#4a5568] dark:text-slate-300 mb-1">
-                      Your Name
-                    </label>
-                    <input
-                      id="contactName"
-                      type="text"
-                      value={formName}
-                      onChange={(e) => setFormName(e.target.value)}
-                      required
-                      placeholder="John Doe"
-                      className="w-full px-4 py-3 rounded-xl neu-inset border-none text-xs focus:outline-none bg-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="contactEmail" className="block text-xs font-bold text-[#4a5568] dark:text-slate-300 mb-1">
-                      Your Email
-                    </label>
-                    <input
-                      id="contactEmail"
-                      type="email"
-                      value={formEmail}
-                      onChange={(e) => setFormEmail(e.target.value)}
-                      required
-                      placeholder="john@example.com"
-                      className="w-full px-4 py-3 rounded-xl neu-inset border-none text-xs focus:outline-none bg-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="contactMessage" className="block text-xs font-bold text-[#4a5568] dark:text-slate-300 mb-1">
-                      Message
-                    </label>
-                    <textarea
-                      id="contactMessage"
-                      value={formMessage}
-                      onChange={(e) => setFormMessage(e.target.value)}
-                      rows={3}
-                      required
-                      placeholder="Let's collaborate on AI or Cybersecurity..."
-                      className="w-full px-4 py-3 rounded-xl neu-inset border-none text-xs focus:outline-none resize-none bg-transparent"
-                    ></textarea>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-3 rounded-xl neu-button text-xs font-bold"
-                  >
-                    {submitting ? 'Transmitting to Server...' : 'Submit via Express API'}
-                  </button>
-
-                  {formStatus && (
-                    <div
-                      className={`p-3 rounded-xl text-xs font-semibold ${
-                        formStatus.success
-                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300'
-                          : 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300'
-                      }`}
-                    >
-                      {formStatus.text}
-                    </div>
-                  )}
-                </form>
-              </div>
-            )}
-
-          </div>
-        </div>
+        )}
       </main>
 
-      {/* Quick Modal Dialog */}
+      {/* Modal de contacto */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={() => setIsModalOpen(false)}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="contact-title"
             className="neu-flat rounded-3xl p-6 sm:p-8 max-w-md w-full relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
+              aria-label="Close"
               className="absolute top-4 right-4 w-8 h-8 rounded-full neu-flat-sm flex items-center justify-center text-xs font-bold"
             >
               ✕
             </button>
-            <h3 className="text-lg font-bold mb-2">Hello Friend!</h3>
-            <p className="text-xs text-[#606f7b] dark:text-slate-400 mb-6">
-              Enter your details and connect instantly with Juan Carlos Arroyo Baquerizo.
-            </p>
+            <h3 id="contact-title" className="text-lg font-bold mb-1">Let&apos;s talk</h3>
+            <p className={`text-sm mb-6 ${TEXT_SUBTLE}`}>Choose how you&apos;d like to reach me.</p>
 
-            <div className="space-y-4 mb-6">
-              <a href={`mailto:${EMAIL}`} className="block p-3 rounded-xl neu-inset hover:opacity-80 transition-opacity">
-                <p className="text-xs font-bold text-[#3182ce] dark:text-blue-400">✉️ Email</p>
-                <p className="text-xs text-[#606f7b] dark:text-slate-300">{EMAIL}</p>
+            <div className="space-y-4">
+              <a href={`mailto:${EMAIL}`} className="block p-4 rounded-xl neu-inset hover:opacity-80 transition-opacity">
+                <p className={`text-sm font-bold ${ACCENT}`}>✉️ Email</p>
+                <p className={`text-xs break-all ${TEXT_SUBTLE}`}>{EMAIL}</p>
               </a>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="block p-3 rounded-xl neu-inset hover:opacity-80 transition-opacity">
-                <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">📞 Phone / WhatsApp</p>
-                <p className="text-xs text-[#606f7b] dark:text-slate-300">(+593) 99 580 6330 • Quito, Ecuador</p>
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="block p-4 rounded-xl neu-inset hover:opacity-80 transition-opacity">
+                <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                  <FaWhatsapp className="text-base text-[#25D366]" aria-hidden="true" />
+                  <span>Phone / WhatsApp</span>
+                </p>
+                <p className={`text-xs ${TEXT_SUBTLE}`}>{PHONE_LABEL}</p>
               </a>
             </div>
-
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="w-full py-3 rounded-xl neu-button text-xs font-bold"
-            >
-              Close Window
-            </button>
           </div>
         </div>
       )}
 
       {/* Footer */}
-      <footer className="max-w-6xl mx-auto px-4 mt-16 text-center text-xs text-[#718096] dark:text-slate-500">
-        <p>© 2026 Juan Carlos Arroyo Baquerizo • Built with React, Vite, Tailwind CSS &amp; Neumorphism</p>
+      <footer className="max-w-6xl mx-auto px-4 mt-16 text-center text-xs text-[#718096] dark:text-neutral-500">
+        <p>© 2026 Juan Carlos Arroyo Baquerizo</p>
       </footer>
     </div>
   );
