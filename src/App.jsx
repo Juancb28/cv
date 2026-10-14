@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaWhatsapp } from 'react-icons/fa';
+import { FaWhatsapp, FaPhoneAlt } from 'react-icons/fa';
 
 /* =========================
    Datos
@@ -10,7 +10,10 @@ const WHATSAPP_URL =
   'https://wa.me/593995806330?text=Hola%20Juan%20Carlos,%20vi%20tu%20portafolio%20y%20me%20gustaría%20contactarte.';
 const GITHUB_URL = 'https://github.com/Juancb28';
 const LINKEDIN_URL = 'https://linkedin.com'; // TODO: reemplazar por la URL real del perfil
-const PLACEHOLDER_IMG = 'public/profile.jpeg';
+/* Rutas de /public respetando el `base` de Vite ('/cv/' en GitHub Pages) */
+const BASE = import.meta.env.BASE_URL;
+const PROFILE_IMG = `${BASE}img20260804_10252243.png`;
+const PLACEHOLDER_IMG = `${BASE}profile.jpeg`;
 
 /* Viñetas visibles por trabajo antes de "Show more" */
 const VISIBLE_BULLETS = 2;
@@ -344,7 +347,7 @@ export default function App() {
           <div className="relative">
             <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-2xl p-2 neu-inset">
               <img
-                src="/img20260804_10252243.png"
+                src={PROFILE_IMG}
                 alt="Juan Carlos Arroyo Baquerizo"
                 className="w-full h-full object-cover rounded-xl grayscale hover:grayscale-0 transition-all duration-500"
                 onError={handleImgError}
@@ -375,6 +378,7 @@ export default function App() {
                 className={BTN_PILL}
                 aria-label={`Phone and WhatsApp ${PHONE_LABEL}`}
               >
+                <FaPhoneAlt className={ACCENT} aria-hidden="true" />
                 <FaWhatsapp className="text-base text-[#25D366]" aria-hidden="true" />
                 <span>{PHONE_LABEL}</span>
               </a>
@@ -469,6 +473,7 @@ export default function App() {
               </a>
               <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="block p-4 rounded-xl neu-inset hover:opacity-80 transition-opacity">
                 <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                  <FaPhoneAlt aria-hidden="true" />
                   <FaWhatsapp className="text-base text-[#25D366]" aria-hidden="true" />
                   <span>Phone / WhatsApp</span>
                 </p>
