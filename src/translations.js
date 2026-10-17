@@ -5,6 +5,7 @@ export const translations = {
       location: '📍 Quito, Ecuador',
       available: 'Disponible para trabajar',
       bio: 'Analista de ciberseguridad y desarrollador de IA construyendo backends seguros, pipelines RAG e integraciones con LLMs.',
+      awayTitle: 'No me olvides!!!',
     },
     nav: {
       lightMode: 'Modo Claro',
@@ -133,6 +134,7 @@ export const translations = {
       location: '📍 Quito, Ecuador',
       available: 'Available for work',
       bio: 'Cybersecurity analyst and AI developer building secure backends, RAG pipelines and LLM integrations.',
+      awayTitle: "Don't forget me!!!",
     },
     nav: {
       lightMode: 'Light Mode',

@@ -25,6 +25,8 @@ const PROFILE_IMG = `${BASE}profile.jpeg`;
 const PLACEHOLDER_IMG = `${BASE}profile.jpeg`;
 const CV_ES_PATH = `${BASE}CV_Juan_Carlos_Arroyo_Baquerizo_ES.pdf`;
 const CV_EN_PATH = `${BASE}CV_Juan_Carlos_Arroyo_Baquerizo_EN.pdf`;
+const FAVICON_MONKEY = `${BASE}monkey.png`;
+const FAVICON_CRYING = `${BASE}crying.png`;
 
 /* Viñetas visibles por trabajo antes de "Show more" */
 const VISIBLE_BULLETS = 2;
@@ -110,6 +112,17 @@ function handleImgError(e) {
   const img = e.currentTarget;
   img.onerror = null;
   img.src = PLACEHOLDER_IMG;
+}
+
+function setFavicon(iconUrl) {
+  let link = document.querySelector("link[rel*='icon']");
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    document.head.appendChild(link);
+  }
+  link.type = 'image/png';
+  link.href = iconUrl;
 }
 
 /* =========================
@@ -293,6 +306,68 @@ export default function App() {
     }
     document.documentElement.lang = lang;
   }, [lang]);
+
+  // Título rotativo ("Juan C. Arroyo - CV   ") y cambio a "No me olvides!!!" con crying.png al salir de la pestaña
+  useEffect(() => {
+    // Precarga el icono de crying para que el cambio sea instantáneo
+    const preload = new Image();
+    preload.src = FAVICON_CRYING;
+
+    const BASE_TITLE = 'Juan C. Arroyo - CV   ';
+    let currentTitle = BASE_TITLE;
+    let titleInterval = null;
+
+    const startTitleRotation = () => {
+      setFavicon(FAVICON_MONKEY);
+      if (titleInterval) clearInterval(titleInterval);
+      titleInterval = setInterval(() => {
+        currentTitle = currentTitle.slice(1) + currentTitle[0];
+        document.title = currentTitle;
+      }, 250);
+    };
+
+    const stopTitleRotation = () => {
+      if (titleInterval) {
+        clearInterval(titleInterval);
+        titleInterval = null;
+      }
+      document.title = t.meta.awayTitle || 'No me olvides!!!';
+      setFavicon(FAVICON_CRYING);
+    };
+
+    if (document.hidden) {
+      stopTitleRotation();
+    } else {
+      startTitleRotation();
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopTitleRotation();
+      } else {
+        startTitleRotation();
+      }
+    };
+
+    const handleBlur = () => {
+      stopTitleRotation();
+    };
+
+    const handleFocus = () => {
+      startTitleRotation();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      if (titleInterval) clearInterval(titleInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [t.meta.awayTitle]);
 
   // Cierra los menús desplegables al hacer clic afuera o presionar Escape
   useEffect(() => {
