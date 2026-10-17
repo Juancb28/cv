@@ -1,93 +1,46 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   FaWhatsapp, FaBrain, FaLink, FaRobot, FaDatabase,
-  FaExchangeAlt, FaCubes, FaBug,
+  FaExchangeAlt, FaCubes, FaBug, FaDownload, FaChevronDown,
+  FaCheck, FaFilePdf,
 } from 'react-icons/fa';
 import {
   SiPython, SiSpringboot, SiMongodb, SiPostgresql, SiGit, SiDocker,
   SiKalilinux, SiArchlinux, SiVmware,
 } from 'react-icons/si';
+import { SpainFlag, USFlag } from './components/Flags.jsx';
+import { translations } from './translations.js';
 
 /* =========================
-   Datos
+   Datos generales y rutas
    ========================= */
 const EMAIL = 'juanarroyobaquerizo2812@gmail.com';
 const PHONE_LABEL = '(+593) 99 580 6330';
-const WHATSAPP_URL =
-  'https://wa.me/593995806330?text=Hola%20Juan%20Carlos,%20vi%20tu%20portafolio%20y%20me%20gustaría%20contactarte.';
 const GITHUB_URL = 'https://github.com/Juancb28';
-const LINKEDIN_URL = 'https://linkedin.com'; // TODO: reemplazar por la URL real del perfil
-/* Rutas de /public respetando el `base` de Vite ('/cv/' en GitHub Pages) */
+const LINKEDIN_URL = 'https://linkedin.com';
+
+/* Rutas de /public respetando el `base` de Vite ('/cv/' en producción / GitHub Pages) */
 const BASE = import.meta.env.BASE_URL;
-const PROFILE_IMG = `${BASE}img20260804_10252243.png`;
+const PROFILE_IMG = `${BASE}profile.jpeg`;
 const PLACEHOLDER_IMG = `${BASE}profile.jpeg`;
+const CV_ES_PATH = `${BASE}CV_Juan_Carlos_Arroyo_Baquerizo_ES.pdf`;
+const CV_EN_PATH = `${BASE}CV_Juan_Carlos_Arroyo_Baquerizo_EN.pdf`;
 
 /* Viñetas visibles por trabajo antes de "Show more" */
 const VISIBLE_BULLETS = 2;
 
-const TABS = [
-  { id: 'overview', label: 'Overview', icon: '📊', color: 'text-blue-600 dark:text-blue-400' },
-  { id: 'experience', label: 'Experience', icon: '⚡', color: 'text-amber-600 dark:text-amber-400' },
-  { id: 'education', label: 'Education', icon: '🎓', color: 'text-emerald-600 dark:text-emerald-400' },
-  { id: 'skills', label: 'Tech Stack', icon: '💻', color: 'text-purple-600 dark:text-purple-400' },
-  { id: 'certifications', label: 'Certifications', icon: '🛡️', color: 'text-rose-600 dark:text-rose-400' },
+const TAB_DEFS = [
+  { id: 'overview', icon: '📊', color: 'text-blue-600 dark:text-blue-400' },
+  { id: 'experience', icon: '⚡', color: 'text-amber-600 dark:text-amber-400' },
+  { id: 'education', icon: '🎓', color: 'text-emerald-600 dark:text-emerald-400' },
+  { id: 'skills', icon: '💻', color: 'text-purple-600 dark:text-purple-400' },
+  { id: 'certifications', icon: '🛡️', color: 'text-rose-600 dark:text-rose-400' },
 ];
 
-const JOBS = [
-  {
-    title: 'AI and Backend Development',
-    period: 'Apr 2026 – Jun 2026',
-    company: 'Vibratio EC S.A.S. (Pericles Project) • Quito, Ecuador',
-    bullets: [
-      'Built RAG pipelines and multi-format legal document ingestion into the Qdrant vector database.',
-      'Cut system response latency from ~2 min to ~20 s and reduced LLM token consumption.',
-      'Developed secure Python microservices with FastAPI, including API security and access control.',
-      'Designed intent flows and block-based conversational memory with automatic executive summaries.',
-      'Ran Web and WhatsApp integration tests and managed versions with Git/GitHub under agile practices.',
-    ],
-  },
-  {
-    title: 'Digital Literacy & Cybersecurity Trainer',
-    period: 'Oct 2024 – Feb 2025',
-    company: 'Digital Inclusion Project • Quito, Ecuador',
-    bullets: [
-      'Trained priority groups in digital literacy and personal data protection.',
-      'Created guides on secure technology adoption and information privacy.',
-    ],
-  },
-];
-
-const EDUCATION = [
-  {
-    institution: 'Escuela Politécnica Nacional (EPN)',
-    degree: 'B.S. in Software Engineering',
-    period: '2023 – Present',
-    description: 'Software architecture, AI & machine learning, databases and information security.',
-  },
-  {
-    institution: 'Colegio Militar Nº1 "Eloy Alfaro"',
-    degree: 'High School Diploma in General Sciences',
-    period: '2018 – 2021',
-    description: 'Quito, Ecuador',
-  },
-];
-
-const CERTIFICATIONS = [
-  {
-    title: 'Fundamentals and Trends in Artificial Intelligence',
-    description: 'JISIC 2025 XII, Escuela Politécnica Nacional.',
-  },
-  {
-    title: 'Practical Cybersecurity Labs (TryHackMe)',
-    description: 'Vulnerability analysis, network scanning and penetration testing in virtual environments.',
-  },
-];
-
-/* Habilidades agrupadas: más fáciles de escanear que una lista plana */
-/* Cada habilidad lleva su icono y el color de su marca */
+/* Habilidades agrupadas con soporte para traducción */
 const SKILL_GROUPS = [
   {
-    title: 'AI & Data',
+    groupKey: 'aiData',
     items: [
       { name: 'RAG', Icon: FaBrain, color: '#D53F8C' },
       { name: 'LangChain', Icon: FaLink, color: '#1C8C6E' },
@@ -98,21 +51,21 @@ const SKILL_GROUPS = [
     ],
   },
   {
-    title: 'Backend',
+    groupKey: 'backend',
     items: [
       { name: 'Python (FastAPI)', Icon: SiPython, color: '#3776AB' },
       { name: 'Java (Spring Boot)', Icon: SiSpringboot, color: '#6DB33F' },
       { name: 'REST APIs', Icon: FaExchangeAlt, color: '#3182CE' },
-      { name: 'Microservices', Icon: FaCubes, color: '#DD6B20' },
+      { nameKey: 'Microservices', defaultName: 'Microservices', Icon: FaCubes, color: '#DD6B20' },
       { name: 'Git', Icon: SiGit, color: '#F05032' },
       { name: 'Docker', Icon: SiDocker, color: '#2496ED' },
     ],
   },
   {
-    title: 'Security & Infra',
+    groupKey: 'securityInfra',
     items: [
-      { name: 'Cybersecurity', Icon: SiKalilinux, color: '#557C94' },
-      { name: 'Vulnerability Analysis', Icon: FaBug, color: '#E53E3E' },
+      { nameKey: 'Cybersecurity', defaultName: 'Cybersecurity', Icon: SiKalilinux, color: '#557C94' },
+      { nameKey: 'Vulnerability Analysis', defaultName: 'Vulnerability Analysis', Icon: FaBug, color: '#E53E3E' },
       { name: 'Linux (Arch/Kali)', Icon: SiArchlinux, color: '#1793D1' },
       { name: 'VMware', Icon: SiVmware, color: '#718096' },
     ],
@@ -139,13 +92,23 @@ function getInitialDarkMode() {
   } catch {
     /* almacenamiento no disponible */
   }
-  // Sin preferencia guardada: respeta la configuración del sistema
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+}
+
+function getInitialLanguage() {
+  try {
+    const saved = localStorage.getItem('language');
+    if (saved === 'es' || saved === 'en') return saved;
+  } catch {
+    /* almacenamiento no disponible */
+  }
+  const browserLang = window.navigator?.language?.toLowerCase() ?? '';
+  return browserLang.startsWith('es') ? 'es' : 'en';
 }
 
 function handleImgError(e) {
   const img = e.currentTarget;
-  img.onerror = null; // evita bucle si el placeholder también falla
+  img.onerror = null;
   img.src = PLACEHOLDER_IMG;
 }
 
@@ -160,7 +123,7 @@ function SectionTitle({ icon, children }) {
   );
 }
 
-function JobItem({ job }) {
+function JobItem({ job, t }) {
   const [expanded, setExpanded] = useState(false);
   const hidden = job.bullets.length - VISIBLE_BULLETS;
   const bullets = expanded ? job.bullets : job.bullets.slice(0, VISIBLE_BULLETS);
@@ -188,34 +151,34 @@ function JobItem({ job }) {
           type="button"
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
-          className={`mt-3 text-xs font-bold ${ACCENT} hover:underline`}
+          className={`mt-3 text-xs font-bold ${ACCENT} hover:underline cursor-pointer`}
         >
-          {expanded ? 'Show less ↑' : `Show ${hidden} more ↓`}
+          {expanded ? t.experience.showLess : t.experience.showMore(hidden)}
         </button>
       )}
     </div>
   );
 }
 
-function ExperienceSection() {
+function ExperienceSection({ t }) {
   return (
     <div className="neu-flat rounded-3xl p-6 sm:p-8">
-      <SectionTitle icon="⚡">Professional Experience</SectionTitle>
+      <SectionTitle icon="⚡">{t.experience.title}</SectionTitle>
       <div className="space-y-8">
-        {JOBS.map((job) => (
-          <JobItem key={job.title} job={job} />
+        {t.experience.jobs.map((job) => (
+          <JobItem key={job.title} job={job} t={t} />
         ))}
       </div>
     </div>
   );
 }
 
-function EducationSection() {
+function EducationSection({ t }) {
   return (
     <div className="neu-flat rounded-3xl p-6 sm:p-8">
-      <SectionTitle icon="🎓">Education</SectionTitle>
+      <SectionTitle icon="🎓">{t.education.title}</SectionTitle>
       <div className="space-y-5">
-        {EDUCATION.map((edu) => (
+        {t.education.items.map((edu) => (
           <div key={edu.institution} className="p-4 rounded-2xl neu-inset">
             <div className="flex justify-between items-start gap-3">
               <div>
@@ -232,12 +195,12 @@ function EducationSection() {
   );
 }
 
-function CertificationsSection() {
+function CertificationsSection({ t }) {
   return (
     <div className="neu-flat rounded-3xl p-6 sm:p-8">
-      <SectionTitle icon="🛡️">Certifications &amp; Training</SectionTitle>
+      <SectionTitle icon="🛡️">{t.certifications.title}</SectionTitle>
       <div className="space-y-4">
-        {CERTIFICATIONS.map((cert) => (
+        {t.certifications.items.map((cert) => (
           <div key={cert.title} className="p-4 rounded-2xl neu-flat-sm">
             <h4 className="font-bold text-sm mb-1">{cert.title}</h4>
             <p className={`text-sm ${TEXT_MUTED}`}>{cert.description}</p>
@@ -248,32 +211,38 @@ function CertificationsSection() {
   );
 }
 
-function SkillsSection() {
+function SkillsSection({ t }) {
   return (
     <div className="neu-flat rounded-3xl p-6 sm:p-8">
-      <SectionTitle icon="💻">Technical Skills</SectionTitle>
+      <SectionTitle icon="💻">{t.skills.title}</SectionTitle>
 
       <div className="space-y-5 mb-6">
-        {SKILL_GROUPS.map((group) => (
-          <div key={group.title}>
-            <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${TEXT_SUBTLE}`}>{group.title}</h4>
-            <div className="flex flex-wrap gap-2">
-              {group.items.map(({ name, Icon, color }) => (
-                <span
-                  key={name}
-                  className={`px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold flex items-center gap-1.5 ${TEXT_MUTED}`}
-                >
-                  <Icon className="text-sm shrink-0" style={{ color }} aria-hidden="true" />
-                  {name}
-                </span>
-              ))}
+        {SKILL_GROUPS.map((group) => {
+          const groupTitle = t.skills.groups[group.groupKey] || group.groupKey;
+          return (
+            <div key={group.groupKey}>
+              <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${TEXT_SUBTLE}`}>{groupTitle}</h4>
+              <div className="flex flex-wrap gap-2">
+                {group.items.map(({ name, nameKey, defaultName, Icon, color }) => {
+                  const displayName = nameKey ? (t.skills.names[nameKey] || defaultName) : name;
+                  return (
+                    <span
+                      key={displayName}
+                      className={`px-3 py-1.5 rounded-xl neu-flat-sm text-xs font-semibold flex items-center gap-1.5 ${TEXT_MUTED}`}
+                    >
+                      <Icon className="text-sm shrink-0" style={{ color }} aria-hidden="true" />
+                      {displayName}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${TEXT_SUBTLE}`}>Languages</h4>
-      <p className={`text-sm ${TEXT_MUTED}`}>Spanish (Native) • English (B2)</p>
+      <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${TEXT_SUBTLE}`}>{t.skills.languagesHeading}</h4>
+      <p className={`text-sm ${TEXT_MUTED}`}>{t.skills.languagesContent}</p>
     </div>
   );
 }
@@ -290,10 +259,18 @@ const SECTION_COMPONENTS = {
    ========================= */
 export default function App() {
   const [darkMode, setDarkMode] = useState(getInitialDarkMode);
+  const [lang, setLang] = useState(getInitialLanguage);
   const [activeTab, setActiveTab] = useState('overview');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCvMenuOpen, setIsCvMenuOpen] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+
   const dashboardRef = useRef(null);
   const isFirstRender = useRef(true);
+  const cvDropdownRef = useRef(null);
+  const langDropdownRef = useRef(null);
+
+  const t = translations[lang] || translations.es;
 
   // Sincroniza el tema con <html> y localStorage
   useEffect(() => {
@@ -306,6 +283,45 @@ export default function App() {
       /* almacenamiento no disponible */
     }
   }, [darkMode]);
+
+  // Sincroniza el idioma con <html> y localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('language', lang);
+    } catch {
+      /* almacenamiento no disponible */
+    }
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  // Cierra los menús desplegables al hacer clic afuera o presionar Escape
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (cvDropdownRef.current && !cvDropdownRef.current.contains(event.target)) {
+        setIsCvMenuOpen(false);
+      }
+      if (langDropdownRef.current && !langDropdownRef.current.contains(event.target)) {
+        setIsLangMenuOpen(false);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        setIsCvMenuOpen(false);
+        setIsLangMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   // Al cambiar de pestaña, lleva la vista al dashboard (no en la carga inicial)
   useEffect(() => {
@@ -338,34 +354,211 @@ export default function App() {
 
       {/* Header / Navbar */}
       <header className="sticky top-0 z-40 bg-[#E4EBF5]/90 dark:bg-[#1e1e1e]/90 backdrop-blur-md px-6 py-4 shadow-[0_8px_16px_rgba(163,177,198,0.5),0_-8px_16px_rgba(255,255,255,0.8)] dark:shadow-[0_8px_16px_rgba(0,0,0,0.45)] mb-8">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full neu-inset flex items-center justify-center font-bold">
               JA
             </div>
             <div>
               <h1 className="text-sm sm:text-base font-bold tracking-tight">Juan Carlos Arroyo Baquerizo</h1>
-              <p className={`text-xs font-medium ${TEXT_SUBTLE}`}>Junior Cybersecurity Analyst | AI Developer</p>
+              <p className={`text-xs font-medium ${TEXT_SUBTLE}`}>{t.meta.role}</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+            {/* Botón de tema claro / oscuro */}
             <button
               type="button"
               onClick={toggleTheme}
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="px-3.5 py-2 rounded-xl neu-button text-xs font-bold flex items-center gap-2"
+              aria-label={darkMode ? t.nav.ariaLight : t.nav.ariaDark}
+              className="px-3 py-2 rounded-xl neu-button text-xs font-bold flex items-center gap-1.5 cursor-pointer"
             >
               <span aria-hidden="true">{darkMode ? '☀️' : '🌙'}</span>
-              <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+              <span>{darkMode ? t.nav.lightMode : t.nav.darkMode}</span>
             </button>
+
+            {/* Botón de descarga de CV con menú emergente localizado */}
+            <div className="relative" ref={cvDropdownRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCvMenuOpen((prev) => !prev);
+                  setIsLangMenuOpen(false);
+                }}
+                aria-expanded={isCvMenuOpen}
+                aria-haspopup="true"
+                className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  isCvMenuOpen ? 'neu-inset' : 'neu-button'
+                }`}
+              >
+                <FaDownload className="text-xs text-[#3182ce] dark:text-blue-300" aria-hidden="true" />
+                <span>{t.nav.downloadCv}</span>
+                <FaChevronDown
+                  className={`text-[10px] transition-transform duration-200 ${isCvMenuOpen ? 'rotate-180' : ''}`}
+                  aria-hidden="true"
+                />
+              </button>
+
+              {/* Menú emergente de opciones de CV (no difumina la pantalla) */}
+              {isCvMenuOpen && (
+                <div
+                  className="absolute right-0 sm:left-0 top-full mt-2 w-64 neu-flat rounded-2xl p-2.5 z-50 shadow-xl border border-black/5 dark:border-white/10"
+                  role="menu"
+                  aria-label={t.nav.downloadCv}
+                >
+                  <div className="px-2 py-1 mb-1 text-[11px] font-bold uppercase tracking-wider text-[#606f7b] dark:text-neutral-400 flex items-center justify-between border-b border-[#b8bec9]/40 dark:border-neutral-700 pb-1.5">
+                    <span>{t.nav.selectVersion}</span>
+                    <FaFilePdf className="text-rose-500 text-xs" aria-hidden="true" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    {/* CV en Español */}
+                    <a
+                      href={CV_ES_PATH}
+                      download="CV_Juan_Carlos_Arroyo_Baquerizo_ES.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsCvMenuOpen(false)}
+                      role="menuitem"
+                      className="flex items-center gap-3 p-2.5 rounded-xl neu-flat-sm hover:neu-inset transition-all cursor-pointer group"
+                    >
+                      <SpainFlag className="w-6 h-4 rounded-sm shadow-xs shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-[#2D3748] dark:text-neutral-100 group-hover:text-[#3182ce] dark:group-hover:text-blue-300 transition-colors">
+                          {t.nav.cvSpanish}
+                        </p>
+                        <p className="text-[10px] text-[#606f7b] dark:text-neutral-400">{t.nav.cvSpanishDesc}</p>
+                      </div>
+                      <FaDownload
+                        className="text-xs text-[#606f7b] dark:text-neutral-400 group-hover:text-[#3182ce] dark:group-hover:text-blue-300 transition-colors shrink-0"
+                        aria-hidden="true"
+                      />
+                    </a>
+
+                    {/* CV en Inglés */}
+                    <a
+                      href={CV_EN_PATH}
+                      download="CV_Juan_Carlos_Arroyo_Baquerizo_EN.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsCvMenuOpen(false)}
+                      role="menuitem"
+                      className="flex items-center gap-3 p-2.5 rounded-xl neu-flat-sm hover:neu-inset transition-all cursor-pointer group"
+                    >
+                      <USFlag className="w-6 h-4 rounded-sm shadow-xs shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-[#2D3748] dark:text-neutral-100 group-hover:text-[#3182ce] dark:group-hover:text-blue-300 transition-colors">
+                          {t.nav.cvEnglish}
+                        </p>
+                        <p className="text-[10px] text-[#606f7b] dark:text-neutral-400">{t.nav.cvEnglishDesc}</p>
+                      </div>
+                      <FaDownload
+                        className="text-xs text-[#606f7b] dark:text-neutral-400 group-hover:text-[#3182ce] dark:group-hover:text-blue-300 transition-colors shrink-0"
+                        aria-hidden="true"
+                      />
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Botón Contact */}
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 rounded-xl neu-button text-xs font-bold"
+              className="px-3.5 py-2 rounded-xl neu-button text-xs font-bold cursor-pointer"
             >
-              Contact
+              {t.nav.contact}
             </button>
+
+            {/* Botón de selección de idioma (a la derecha de Contact) */}
+            <div className="relative" ref={langDropdownRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLangMenuOpen((prev) => !prev);
+                  setIsCvMenuOpen(false);
+                }}
+                aria-expanded={isLangMenuOpen}
+                aria-haspopup="true"
+                aria-label={t.nav.selectLanguage}
+                className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  isLangMenuOpen ? 'neu-inset' : 'neu-button'
+                }`}
+              >
+                {lang === 'es' ? (
+                  <SpainFlag className="w-4 h-3 rounded-xs shrink-0" />
+                ) : (
+                  <USFlag className="w-4 h-3 rounded-xs shrink-0" />
+                )}
+                <span>{lang.toUpperCase()}</span>
+                <FaChevronDown
+                  className={`text-[10px] transition-transform duration-200 ${isLangMenuOpen ? 'rotate-180' : ''}`}
+                  aria-hidden="true"
+                />
+              </button>
+
+              {/* Menú de idiomas */}
+              {isLangMenuOpen && (
+                <div
+                  className="absolute right-0 top-full mt-2 w-44 neu-flat rounded-2xl p-2 z-50 shadow-xl border border-black/5 dark:border-white/10"
+                  role="menu"
+                  aria-label={t.nav.selectLanguage}
+                >
+                  <div className="px-2 py-1 mb-1 text-[11px] font-bold uppercase tracking-wider text-[#606f7b] dark:text-neutral-400 border-b border-[#b8bec9]/40 dark:border-neutral-700 pb-1.5">
+                    <span>{t.nav.language}</span>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    {/* Español */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLang('es');
+                        setIsLangMenuOpen(false);
+                      }}
+                      role="menuitem"
+                      className={`flex items-center justify-between w-full p-2.5 rounded-xl transition-all cursor-pointer ${
+                        lang === 'es'
+                          ? 'neu-inset text-[#3182ce] dark:text-blue-300 font-bold'
+                          : 'neu-flat-sm hover:neu-inset text-[#2D3748] dark:text-neutral-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <SpainFlag className="w-5 h-3.5 rounded-xs shrink-0" />
+                        <span className="text-xs">Español</span>
+                        <span className="text-[10px] text-[#606f7b] dark:text-neutral-400 font-semibold">(ES)</span>
+                      </div>
+                      {lang === 'es' && (
+                        <FaCheck className="text-xs text-[#3182ce] dark:text-blue-300" aria-hidden="true" />
+                      )}
+                    </button>
+
+                    {/* Inglés */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLang('en');
+                        setIsLangMenuOpen(false);
+                      }}
+                      role="menuitem"
+                      className={`flex items-center justify-between w-full p-2.5 rounded-xl transition-all cursor-pointer ${
+                        lang === 'en'
+                          ? 'neu-inset text-[#3182ce] dark:text-blue-300 font-bold'
+                          : 'neu-flat-sm hover:neu-inset text-[#2D3748] dark:text-neutral-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <USFlag className="w-5 h-3.5 rounded-xs shrink-0" />
+                        <span className="text-xs">English</span>
+                        <span className="text-[10px] text-[#606f7b] dark:text-neutral-400 font-semibold">(EN)</span>
+                      </div>
+                      {lang === 'en' && (
+                        <FaCheck className="text-xs text-[#3182ce] dark:text-blue-300" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -386,61 +579,61 @@ export default function App() {
             </div>
             <span
               className="absolute bottom-4 right-4 w-4 h-4 bg-emerald-500 border-2 border-[#E4EBF5] dark:border-[#1e1e1e] rounded-full animate-pulse"
-              title="Available for work"
+              title={t.meta.available}
             ></span>
           </div>
 
           <div className="flex-1 text-center md:text-left">
             <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold neu-inset mb-3 ${TEXT_MUTED}`}>
-              📍 Quito, Ecuador
+              {t.meta.location}
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold mb-3">Juan Carlos Arroyo Baquerizo</h2>
             <p className={`text-sm sm:text-base font-medium mb-6 max-w-xl mx-auto md:mx-0 ${TEXT_MUTED}`}>
-              Cybersecurity analyst and AI developer building secure backends, RAG pipelines and LLM integrations.
+              {t.meta.bio}
             </p>
             <div className="flex flex-wrap justify-center md:justify-start gap-3">
               <a href={`mailto:${EMAIL}`} className={BTN_PILL}>
-                <span aria-hidden="true">✉️</span> Email
+                <span aria-hidden="true">✉️</span> {t.hero.email}
               </a>
               <a
-                href={WHATSAPP_URL}
+                href={t.hero.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={BTN_PILL}
-                aria-label={`Phone and WhatsApp ${PHONE_LABEL}`}
+                aria-label={t.hero.whatsappAria}
               >
                 <FaWhatsapp className="text-base text-[#25D366]" aria-hidden="true" />
                 <span>{PHONE_LABEL}</span>
               </a>
               <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className={BTN_PILL}>
-                <span aria-hidden="true">🐙</span> GitHub
+                <span aria-hidden="true">🐙</span> {t.hero.github}
               </a>
               <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" className={BTN_PILL}>
-                <span aria-hidden="true">💼</span> LinkedIn
+                <span aria-hidden="true">💼</span> {t.hero.linkedin}
               </a>
             </div>
           </div>
         </section>
 
         {/* Navegación por secciones */}
-        <nav ref={dashboardRef} className="mb-10 scroll-mt-32" aria-label="Portfolio sections">
+        <nav ref={dashboardRef} className="mb-10 scroll-mt-32" aria-label={t.tabs.heading}>
           <div className="flex items-baseline justify-between gap-3 mb-4 px-2">
-            <h3 className="text-lg font-bold">Explore my profile</h3>
-            <p className={`hidden sm:block text-xs ${TEXT_SUBTLE}`}>Pick a section to focus on it</p>
+            <h3 className="text-lg font-bold">{t.tabs.heading}</h3>
+            <p className={`hidden sm:block text-xs ${TEXT_SUBTLE}`}>{t.tabs.subheading}</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {TABS.map((tab) => (
+            {TAB_DEFS.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 aria-pressed={activeTab === tab.id}
-                className={`p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all ${
+                className={`p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all cursor-pointer ${
                   activeTab === tab.id ? 'active neu-inset' : 'neu-button'
                 }`}
               >
                 <span className={`text-2xl ${tab.color}`} aria-hidden="true">{tab.icon}</span>
-                <span className="text-xs font-semibold">{tab.label}</span>
+                <span className="text-xs font-semibold">{t.tabs[tab.id]}</span>
               </button>
             ))}
           </div>
@@ -449,7 +642,7 @@ export default function App() {
         {/* Sección elegida: centrada debajo de la navegación */}
         {FeaturedSection && (
           <section key={featured} className="featured-section max-w-3xl mx-auto mb-12">
-            <FeaturedSection />
+            <FeaturedSection t={t} />
           </section>
         )}
 
@@ -459,13 +652,13 @@ export default function App() {
             <div className="space-y-8 lg:col-span-2">
               {LEFT_SECTIONS.map((id) => {
                 const Section = SECTION_COMPONENTS[id];
-                return <Section key={id} />;
+                return <Section key={id} t={t} />;
               })}
             </div>
             <div className="space-y-8">
               {RIGHT_SECTIONS.map((id) => {
                 const Section = SECTION_COMPONENTS[id];
-                return <Section key={id} />;
+                return <Section key={id} t={t} />;
               })}
             </div>
           </div>
@@ -488,23 +681,28 @@ export default function App() {
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              aria-label="Close"
-              className="absolute top-4 right-4 w-8 h-8 rounded-full neu-flat-sm flex items-center justify-center text-xs font-bold"
+              aria-label={t.contactModal.close}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full neu-flat-sm flex items-center justify-center text-xs font-bold cursor-pointer"
             >
               ✕
             </button>
-            <h3 id="contact-title" className="text-lg font-bold mb-1">Let&apos;s talk</h3>
-            <p className={`text-sm mb-6 ${TEXT_SUBTLE}`}>Choose how you&apos;d like to reach me.</p>
+            <h3 id="contact-title" className="text-lg font-bold mb-1">{t.contactModal.title}</h3>
+            <p className={`text-sm mb-6 ${TEXT_SUBTLE}`}>{t.contactModal.subtitle}</p>
 
             <div className="space-y-4">
               <a href={`mailto:${EMAIL}`} className="block p-4 rounded-xl neu-inset hover:opacity-80 transition-opacity">
-                <p className={`text-sm font-bold ${ACCENT}`}>✉️ Email</p>
+                <p className={`text-sm font-bold ${ACCENT}`}>✉️ {t.contactModal.email}</p>
                 <p className={`text-xs break-all ${TEXT_SUBTLE}`}>{EMAIL}</p>
               </a>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="block p-4 rounded-xl neu-inset hover:opacity-80 transition-opacity">
+              <a
+                href={t.hero.whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block p-4 rounded-xl neu-inset hover:opacity-80 transition-opacity"
+              >
                 <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
                   <FaWhatsapp className="text-base text-[#25D366]" aria-hidden="true" />
-                  <span>Phone / WhatsApp</span>
+                  <span>{t.contactModal.phone}</span>
                 </p>
                 <p className={`text-xs ${TEXT_SUBTLE}`}>{PHONE_LABEL}</p>
               </a>
@@ -515,7 +713,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="max-w-6xl mx-auto px-4 mt-16 text-center text-xs text-[#718096] dark:text-neutral-500">
-        <p>© 2026 Juan Carlos Arroyo Baquerizo</p>
+        <p>{t.footer.copyright}</p>
       </footer>
     </div>
   );
